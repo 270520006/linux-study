@@ -1,2 +1,1 @@
-# linux-study
-学不完的linux操作
+# Linux的学习
