@@ -29,6 +29,136 @@ echo "this is a test" | awk '{ print $1, $2 }'
 this is
 ```
 
+### 案例
+
+创建一个passwd文件，用来我们学习awk案例，文件如下：
+
+```shell
+root:x:0:0:root:/root:/bin/bash  
+bin:x:1:1:bin:/bin:/sbin/nologin  
+daemon:x:2:2:daemon:/sbin:/sbin/nologin  
+adm:x:3:4:adm:/var/adm:/sbin/nologin  
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+```
+
+* **只显示/etc/passwd的账户：**
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# awk -F : ' {print $1}' password 
+root
+bin
+daemon
+adm
+lp
+```
+
+* **显示/etc/passwd的第1列和第7列，用逗号分隔显示，所有行开始前添加列名start1，start7，最后一行添加，end1，end7（学到了BEGIN和END的用法）**
+  * 注意点1：$1和$7在" "号外
+  * 注意点2：BEGIN和 END都是大写
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# awk -F ':' 'BEGIN {print"start1,start7"} \
+{print $1","$7} END {print "End1,End7"}' password 
+start1,start7
+root,/bin/bash  
+bin,/sbin/nologin  
+daemon,/sbin/nologin  
+adm,/sbin/nologin  
+lp,/sbin/nologin
+End1,End7
+```
+
+* **统计/etc/passwd文件中，每行的行号，每行的列数，对应的完整行内容(NR是行号，NF是列数)**
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# awk -F : '{print NR " " NF " "$0 }' password 
+1 7 root:x:0:0:root:/root:/bin/bash  
+2 7 bin:x:1:1:bin:/bin:/sbin/nologin  
+3 7 daemon:x:2:2:daemon:/sbin:/sbin/nologin  
+4 7 adm:x:3:4:adm:/var/adm:/sbin/nologin  
+5 7 lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+```
+
+* **将`/etc/passwd`的用户名变成大写输出(toupper)**
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# awk -F ':' '{print toupper($0)}' password 
+ROOT:X:0:0:ROOT:/ROOT:/BIN/BASH  
+BIN:X:1:1:BIN:/BIN:/SBIN/NOLOGIN  
+DAEMON:X:2:2:DAEMON:/SBIN:/SBIN/NOLOGIN  
+ADM:X:3:4:ADM:/VAR/ADM:/SBIN/NOLOGIN  
+LP:X:4:7:LP:/VAR/SPOOL/LPD:/SBIN/NOLOGIN
+```
+
+* 显示/etc/passwd中有var的行
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# awk -F ':' '$0 ~ /var/' password
+adm:x:3:4:adm:/var/adm:/sbin/nologin  
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+```
+
+### 支持的内置变量
+
+​	上面示例中`NR`，和`NF`其实就是`awk`的内置变量，一些内置变量如下：
+
+```
+变量名 解释
+FILENAMEawk浏览的文件名
+FS设置输入字段分隔符，等价于命令行-F选项
+NF 浏览记录的字段个数
+NR 已读的记录数
+```
+
+### 支持函数
+
+* **输出字符串的长度(length)**
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# awk 'BEGIN{print length("this is a test ")}'
+15
+```
+
+* **将`/etc/passwd`的全部语句变成大写输出(toupper)**
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# awk -F ':' '{print toupper($0)}' password 
+ROOT:X:0:0:ROOT:/ROOT:/BIN/BASH  
+BIN:X:1:1:BIN:/BIN:/SBIN/NOLOGIN  
+DAEMON:X:2:2:DAEMON:/SBIN:/SBIN/NOLOGIN  
+ADM:X:3:4:ADM:/VAR/ADM:/SBIN/NOLOGIN  
+LP:X:4:7:LP:/VAR/SPOOL/LPD:/SBIN/NOLOGIN
+```
+
+常用函数：
+
+```shell
+函数名 作用
+toupper(s)返回s的大写
+tolower(s) 返回s的小写
+length(s) 返回s长度
+substr(s,p) 返回字符串s中从p开始的后缀部分
+```
+
+### 正则表达式
+
+​	常用正则表达式：
+
+```shell
+操作符	描述
+<  小于 < = 小于等于 == 等于 != 不等于 ~ 匹配正则表达式 !~ 不匹配正则表达式 
+```
+
+* 显示/etc/passwd中有var的行
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# awk -F ':' '$0 ~ /var/' password
+adm:x:3:4:adm:/var/adm:/sbin/nologin  
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+```
+
+
+
 ## scp
 
 ### 简单的传输文件
