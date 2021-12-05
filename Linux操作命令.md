@@ -308,6 +308,8 @@ ps：（sed的删除默认带-e，不对具体文件进行操作）
 cp password password.sed
 ```
 
+#### 删除
+
 * 删除第二行数据（sed默认使用-e，不改变文件，所以文件没发生改变）
 
 ```shell
@@ -352,6 +354,89 @@ root:x:0:0:root:/root:/bin/bash
 lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
 [root@iZbp1jd5ee7h52j00jed2wZ linux-study]# sed '2,$d' password.sed 
 root:x:0:0:root:/root:/bin/bash  
+```
+
+#### 增加
+
+* 在第二行后(亦即是加在第三行)加上『drink tea?』字样）add（a是加在后面）
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# nl password.sed |sed '2a drink tea '
+     1	root:x:0:0:root:/root:/bin/bash  
+     2	bin:x:1:1:bin:/bin:/sbin/nologin  
+drink tea 
+     3	daemon:x:2:2:daemon:/sbin:/sbin/nologin  
+     4	adm:x:3:4:adm:/var/adm:/sbin/nologin  
+     5	lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+```
+
+* 那如果是要在第二行前加上drink tea，则使用insert（i是加在后面）
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# nl password.sed | sed '2i drink tea'
+     1	root:x:0:0:root:/root:/bin/bash  
+drink tea
+     2	bin:x:1:1:bin:/bin:/sbin/nologin  
+     3	daemon:x:2:2:daemon:/sbin:/sbin/nologin  
+     4	adm:x:3:4:adm:/var/adm:/sbin/nologin  
+     5	lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+```
+
+* 如果是要增加两行以上，在第二行后面加入两行字，例如『Drink tea or .....』与『drink beer?』（使用换行符\）
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# nl password.sed | sed '2a drink tea ......\
+> dirnk beer'
+     1	root:x:0:0:root:/root:/bin/bash  
+     2	bin:x:1:1:bin:/bin:/sbin/nologin  
+drink tea ......
+dirnk beer
+     3	daemon:x:2:2:daemon:/sbin:/sbin/nologin  
+     4	adm:x:3:4:adm:/var/adm:/sbin/nologin  
+     5	lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+```
+
+#### 替换与显示
+
+* 将第2-4行的内容取代成为『No 2-4 number』
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# nl password.sed |sed '2,4c No 2-4 number'
+     1	root:x:0:0:root:/root:/bin/bash  
+No 2-4 number
+     5	lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+```
+
+* 只显示2-4行
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# nl password.sed |sed -n '2,4p'
+     2	bin:x:1:1:bin:/bin:/sbin/nologin  
+     3	daemon:x:2:2:daemon:/sbin:/sbin/nologin  
+     4	adm:x:3:4:adm:/var/adm:/sbin/nologin  
+```
+
+#### 搜索
+
+* 搜索带root的行（如果只要匹配行，则可以加上-n）
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# nl password.sed |sed   '/root/p'
+     1	root:x:0:0:root:/root:/bin/bash  
+     1	root:x:0:0:root:/root:/bin/bash  
+     2	bin:x:1:1:bin:/bin:/sbin/nologin  
+     3	daemon:x:2:2:daemon:/sbin:/sbin/nologin  
+     4	adm:x:3:4:adm:/var/adm:/sbin/nologin  
+     5	lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+```
+
+* 搜索带var的行，并且删除
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# nl password.sed |sed   '/var/d'
+     1	root:x:0:0:root:/root:/bin/bash  
+     2	bin:x:1:1:bin:/bin:/sbin/nologin  
+     3	daemon:x:2:2:daemon:/sbin:/sbin/nologin  
 ```
 
 
