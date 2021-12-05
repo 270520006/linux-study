@@ -1,4 +1,4 @@
-# Linux操作命令
+# 三剑客（awk、sed、grep）
 
 ## awk
 
@@ -82,12 +82,12 @@ End1,End7
 * **将`/etc/passwd`的用户名变成大写输出(toupper)**
 
 ```shell
-[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# awk -F ':' '{print toupper($0)}' password 
-ROOT:X:0:0:ROOT:/ROOT:/BIN/BASH  
-BIN:X:1:1:BIN:/BIN:/SBIN/NOLOGIN  
-DAEMON:X:2:2:DAEMON:/SBIN:/SBIN/NOLOGIN  
-ADM:X:3:4:ADM:/VAR/ADM:/SBIN/NOLOGIN  
-LP:X:4:7:LP:/VAR/SPOOL/LPD:/SBIN/NOLOGIN
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# awk -F ':' '{print toupper($1)}' password 
+ROOT
+BIN
+DAEMON
+ADM
+LP
 ```
 
 * 显示/etc/passwd中有var的行
@@ -97,6 +97,56 @@ LP:X:4:7:LP:/VAR/SPOOL/LPD:/SBIN/NOLOGIN
 adm:x:3:4:adm:/var/adm:/sbin/nologin  
 lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
 ```
+
+* 每一行的长度
+
+```shell
+* [root@iZbp1jd5ee7h52j00jed2wZ linux-study]# awk -F ':' ' {print length($0)}' password 
+  33
+  34
+  41
+  38
+  40
+```
+
+可以用的语句：if while do/while for break continue
+
+* 输出第一个字段的第一个字符大于d的行
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# awk -F ':' '{if($1>"d"){print $1}else{print "--"}}' password 
+root
+--
+daemon
+--
+lp
+```
+
+* 把上面的语句写入脚本中，可以用awk使用
+  * 脚本语句
+
+```shell
+{   
+    if ($1 > "d") {  
+        print $1   
+    } else {  
+        print "-"   
+    }   
+}
+```
+
+使用语句：
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# awk -F ':' -f password.sh password
+root
+-
+daemon
+-
+lp
+```
+
+
 
 ### 支持的内置变量
 
@@ -157,7 +207,177 @@ adm:x:3:4:adm:/var/adm:/sbin/nologin
 lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
 ```
 
+### 流程控制语句
 
+可以用的语句：if while do/while for break continue
+
+* 输出第一个字段的第一个字符大于d的行
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# awk -F ':' '{if($1>"d"){print $1}else{print "--"}}' password 
+root
+--
+daemon
+--
+lp
+```
+
+#### 执行脚本
+
+* 把上面的语句写入脚本中，可以用awk使用
+  * 脚本语句
+
+```shell
+{   
+    if ($1 > "d") {  
+        print $1   
+    } else {  
+        print "-"   
+    }   
+}
+```
+
+使用语句：
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# awk -F ':' -f password.sh password
+root
+-
+daemon
+-
+lp
+```
+
+## sed
+
+​	**sed**是一种流编辑器，它是文本处理中非常好的工具，能够完美的配合正则表达式使用，功能不同凡响。处理时，把当前处理的行存储在临时缓冲区中，称为“模式空间”（pattern space），接着用sed[命令](https://www.linuxcool.com/)处理缓冲区中的内容，处理完成后，把缓冲区的内容送往屏幕。接着处理下一行，这样不断重复，直到文件末尾。文件内容并没有改变，除非你使用重定向存储输出。Sed主要用来自动编辑一个或多个文件，可以将数据行进行替换、删除、新增、选取等特定工作，简化对文件的反复操作，编写转换程序等。
+
+```shell
+sed的命令格式：sed [options] 'command' file(s);
+sed的脚本格式：sed [options] -f scriptfile file(s);
+```
+
+### 选项
+
+ps：（sed的删除默认带-e，不对具体文件进行操作）
+
+```shell
+ -e ：直接在命令行模式上进行sed动作编辑，此为默认选项;
+ -f ：将sed的动作写在一个文件内，用–f filename 执行filename内的sed动作;
+ -i ：直接修改文件内容;
+ -n ：只打印模式匹配的行；
+ -r ：支持扩展表达式;
+ -h或--help：显示帮助；
+ -V或--version：显示版本信息。
+```
+
+### 具体参数
+
+```shell
+ a\ 在当前行下面插入文本;
+ i\ 在当前行上面插入文本;
+ c\ 把选定的行改为新的文本;
+ d 删除，删除选择的行;
+ D 删除模板块的第一行;
+ s 替换指定字符;
+ h 拷贝模板块的内容到内存中的缓冲区;
+ H 追加模板块的内容到内存中的缓冲区;
+ g 获得内存缓冲区的内容，并替代当前模板块中的文本;
+ G 获得内存缓冲区的内容，并追加到当前模板块文本的后面;
+ l 列表不能打印字符的清单;
+ n 读取下一个输入行，用下一个命令处理新的行而不是用第一个命令;
+ N 追加下一个输入行到模板块后面并在二者间嵌入一个新行，改变当前行号码;
+ p 打印模板块的行。 P(大写) 打印模板块的第一行;
+ q 退出Sed;
+ b lable 分支到脚本中带有标记的地方，如果分支不存在则分支到脚本的末尾;
+ r file 从file中读行;
+ t label if分支，从最后一行开始，条件一旦满足或者T，t命令，将导致分支到带有标号的命令处，或者到脚本的末尾;
+ T label 错误分支，从最后一行开始，一旦发生错误或者T，t命令，将导致分支到带有标号的命令处，或者到脚本的末尾;
+ w file 写并追加模板块到file末尾;
+ W file 写并追加模板块的第一行到file末尾;
+ ! 表示后面的命令对所有没有被选定的行发生作用;
+ = 打印当前行号;
+ # 把注释扩展到下一个换行符以前;
+```
+
+### 案例
+
+先把password复制一份到password.sed上：
+
+```shell
+cp password password.sed
+```
+
+* 删除第二行数据（sed默认使用-e，不改变文件，所以文件没发生改变）
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# cat password.sed 
+root:x:0:0:root:/root:/bin/bash  
+bin:x:1:1:bin:/bin:/sbin/nologin  
+daemon:x:2:2:daemon:/sbin:/sbin/nologin  
+adm:x:3:4:adm:/var/adm:/sbin/nologin  
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# sed '2d' password.sed 
+root:x:0:0:root:/root:/bin/bash  
+daemon:x:2:2:daemon:/sbin:/sbin/nologin  
+adm:x:3:4:adm:/var/adm:/sbin/nologin  
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# cat  password.sed 
+root:x:0:0:root:/root:/bin/bash  
+bin:x:1:1:bin:/bin:/sbin/nologin  
+daemon:x:2:2:daemon:/sbin:/sbin/nologin  
+adm:x:3:4:adm:/var/adm:/sbin/nologin  
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+```
+
+* 对文件进行真正的删除（-i）
+  * 这边删除完，我用cp又复制回去会
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# sed -i '2d' password.sed 
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# cat password.sed 
+root:x:0:0:root:/root:/bin/bash  
+daemon:x:2:2:daemon:/sbin:/sbin/nologin  
+adm:x:3:4:adm:/var/adm:/sbin/nologin  
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+```
+
+* 删除2~4行数据，删除第二行往后的所有数据
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# sed '2,4d' password.sed 
+root:x:0:0:root:/root:/bin/bash  
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# sed '2,$d' password.sed 
+root:x:0:0:root:/root:/bin/bash  
+```
+
+
+
+# Linux基本命令
+
+## nl
+
+​	nl命令在[linux](http://codex.wordpress.org.cn/Linux)系统中用来计算文件中行号。nl 可以将输出的文件内容自动的加上行号！其默认的结果与 cat -n 有点不太一样， nl 可以将行号做比较多的显示设计，包括位数与是否自动补齐 0 等等的功能。 
+
+```
+nl [选项]... [文件]...
+```
+
+### 命令参数
+
+```shell
+-b  ：指定行号指定的方式，主要有两种：
+-b a ：表示不论是否为空行，也同样列出行号(类似 cat -n)；
+-b t ：如果有空行，空的那一行不要列出行号(默认值)；
+-n  ：列出行号表示的方法，主要有三种：
+-n ln ：行号在萤幕的最左方显示；
+-n rn ：行号在自己栏位的最右方显示，且不加 0 ；
+-n rz ：行号在自己栏位的最右方显示，且加 0 ；
+-w  ：行号栏位的占用的位数。
+```
 
 ## scp
 
