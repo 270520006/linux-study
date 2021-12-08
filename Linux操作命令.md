@@ -433,7 +433,7 @@ No 2-4 number
 * 搜索带var的行，并且删除
 
 ```shell
-[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# nl password.sed |sed   '/var/d'
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# nl password.sed |sed   '/var/p'
      1	root:x:0:0:root:/root:/bin/bash  
      2	bin:x:1:1:bin:/bin:/sbin/nologin  
      3	daemon:x:2:2:daemon:/sbin:/sbin/nologin  
@@ -442,6 +442,30 @@ No 2-4 number
 
 
 # Linux基本命令
+
+## ln
+
+### 软连接
+
+软连接是linux中一个常用命令，它的功能是为某一个文件在另外一个位置建立一个同不的链接。当 我们需要在不同的目录，用到相同的文件时，我们不需要在每一个需要的目录下都放一个必须相同的文件，我们只要在其它的 目录下用ln命令链接（link）就可以，不必重复的占用磁盘空间。
+
+具体用法是：ln -s 源文件 目标文件。 
+
+ 例如：
+
+```shell
+ln -s /usr/local/mysql/bin/mysql /usr/bin
+```
+
+### 硬链接
+
+​	硬连接指通过索引节点来进行连接。在Linux的文件系统中，保存在磁盘分区中的文件不管是什么类型都给它分配一个编号，称为索引节点号(Inode Index)。在Linux中，多个文件名指向同一索引节点是存在的。一般这种连接就是硬连接。硬连接的作用是允许一个文件拥有多个有效路径名，这样用户就可以建立硬连接到重要文件，以防止“误删”的功能。其原因如上所述，因为对应该目录的索引节点有一个以上的连接。只删除一个连接并不影响索引节点本身和其它的连接，只有当最后一个连接被删除后，文件的数据块及目录的连接才会被释放。也就是说，文件真正删除的条件是与之相关的所有硬连接文件均被删除。
+
+​	直接不写参数就是硬链接：
+
+```shell
+ln /usr/local/mysql/bin/mysql /usr/bin
+```
 
 ## nl
 
@@ -464,6 +488,72 @@ nl [选项]... [文件]...
 -w  ：行号栏位的占用的位数。
 ```
 
+## tar
+
+​	Linux用来解压和解压的命令如下：
+
+```shell
+.tar
+解包：tar xvf FileName.tar
+打包：tar cvf FileName.tar DirName
+（注：tar是打包，不是压缩！）
+———————————————
+.gz
+解压1：gunzip FileName.gz
+解压2：gzip -d FileName.gz
+压缩：gzip FileName
+
+.tar.gz 和 .tgz
+解压：tar zxvf FileName.tar.gz
+压缩：tar zcvf FileName.tar.gz DirName
+———————————————
+.bz2
+解压1：bzip2 -d FileName.bz2
+解压2：bunzip2 FileName.bz2
+压缩： bzip2 -z FileName
+ 
+.tar.bz2
+解压：tar jxvf FileName.tar.bz2
+压缩：tar jcvf FileName.tar.bz2 DirName
+———————————————
+.bz
+解压1：bzip2 -d FileName.bz
+解压2：bunzip2 FileName.bz
+压缩：未知
+
+.tar.bz
+解压：tar jxvf FileName.tar.bz
+压缩：未知
+———————————————
+.Z
+解压：uncompress FileName.Z
+压缩：compress FileName
+.tar.Z
+
+解压：tar Zxvf FileName.tar.Z
+压缩：tar Zcvf FileName.tar.Z DirName
+———————————————
+.zip
+解压：unzip FileName.zip
+压缩：zip FileName.zip DirName
+———————————————
+.rar
+解压：rar x FileName.rar
+压缩：rar a FileName.rar DirName
+———————————————
+.lha
+解压：lha -e FileName.lha
+压缩：lha -a FileName.lha FileName
+———————————————
+.rpm
+解包：rpm2cpio FileName.rpm | cpio -div
+———————————————
+.deb
+解包：ar p FileName.deb data.tar.gz | tar zxf -
+```
+
+
+
 ## scp
 
 ### 简单的传输文件
@@ -480,3 +570,24 @@ root@121.196.202.119's password:
 Linux操作命令.md                          100% 1262    44.8KB/s   00:00
 ```
 
+## rsa验证
+
+### scp免密设置（可本机）
+
+​	scp经常要输入密码非常麻烦，我们可以生成rsa秘钥然后加入想要免密的机子里即可，步骤如下：
+
+* 使用命令生成秘钥
+
+```shell
+ssh-keygen -t rsa
+```
+
+* 将生成的id_rsa.pub传送到目标机的/root/.ssh/上，而后把pub追加到authorized_keys中：
+
+```
+scp id_rsa.pub root root@xxx.xxx.xx.xxx  /root/.ssh/
+
+echo id_rsa.pub >>authorized_keys
+```
+
+当然如果你要模拟服务器，直接scp到自己文件上也可以。
