@@ -416,6 +416,13 @@ No 2-4 number
      4	adm:x:3:4:adm:/var/adm:/sbin/nologin  
 ```
 
+* 替换指定字符串
+  * 把root替换成user
+
+```
+sed 's/root/user'
+```
+
 #### 搜索
 
 * 搜索带root的行（如果只要匹配行，则可以加上-n）
@@ -585,9 +592,14 @@ ssh-keygen -t rsa
 * 将生成的id_rsa.pub传送到目标机的/root/.ssh/上，而后把pub追加到authorized_keys中：
 
 ```
-scp id_rsa.pub root root@xxx.xxx.xx.xxx  /root/.ssh/
+scp id_rsa.pub  root@xxx.xxx.xx.xxx  /root/.ssh/
 
 echo id_rsa.pub >>authorized_keys
 ```
 
 当然如果你要模拟服务器，直接scp到自己文件上也可以。
+
+```shell
+cp id_rsa.pub authorized_keys
+```
+
