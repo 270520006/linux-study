@@ -118,3 +118,27 @@ ${-#*i} 这个表达式的意思是：从左向右，在 - 变量中找到第一
 ```
 
 ![在这里插入图片描述](README/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NvZGluZ19kb25n,size_16,clor_FFFFFF,t_70.png)
+
+
+
+## Linux用户权限
+
+​	理解一下本质:Linux中一切皆文件，这里的添加用户说白了就是往某一个文件中写入用户的信息了！
+
+* 查看所有用户组：
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ ~]# cat /etc/group
+root:x:0:
+bin:x:1:
+daemon:x:2:
+```
+
+​	文件的每一个行都代表一个用户。换句话说，这个文件有几行你的系统中就拥有几个用户。每一行由冒号“:”分割成7个字段，其结构如下所示:
+
+```
+用户名:密码:UID:GID:用户全名:home目录:shell
+```
+
+ 
+
