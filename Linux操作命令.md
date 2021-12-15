@@ -476,7 +476,54 @@ ln /usr/local/mysql/bin/mysql /usr/bin
 
 ## chmod
 
-​	授权命令
+​	每个用户都有一个用户组，系统可以对一个用户组中的所有用户进行集中管理（开发、测试、运维、root )。不同Linux系统对用户组的规定有所不同，如Linux下的用户属于与它同名的用户组，这个用户组在创建用户时同时创建。
+​	用户组的管理涉及用户组的添加、删除和修改。组的增加、删除和修改实际上就是对/etc/group文件的更新。
+​	用户组的管理涉及用户组的添加、删除和修改。组的增加、删除和修改实际上就是对/etc/group文件的更新。
+
+这里把授权的介绍分为两部分，用户/用户组和授权操作：
+
+### 用户和用户组
+
+* 查看用户组 
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# cat /etc/group
+root:x:0:
+bin:x:1:
+daemon:x:2:
+#用户名:密码:UID:GID:用户全名:home目录:shell
+```
+
+上面的字段代表意思：用户名:密码:UID:GID:用户全名:home目录:shell
+
+* 添加用户组（可以用 cat /etc/group查看 ）
+
+```
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# groupadd zsp
+```
+
+* 删除用户组
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# groupdel zsp
+```
+
+* 修改用户组
+
+```shell
+[root@iZbp1jd5ee7h52j00jed2wZ linux-study]# cat /etc/group |grep 'zsp'
+newzsp:x:666:
+```
+
+* 添加用户
+
+​	useradd可用来建立用户账号，它和adduser命令是相同的。账号建好之后，再用passwd设定账号的密码。使用useradd命令所建立的账号，实际上是保存在/etc/passwd文本文件中。
+
+```
+useradd zsp
+```
+
+
 
 ## nl
 
