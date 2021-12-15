@@ -14,6 +14,59 @@
 
 ## 常用基础命令
 
+### 目录和文件处理
+
+| 命令                                                         | 说明                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 目录和文件处理：在讲解之前，我们先认识一下几个好玩的符号. ：小点活在当下，即当前目录。例如：./jie_work执行当前目录下的jie_work文件..：两点跑上去，既到当前的上一级目录。举个例子，命令cd..修改当前工作目录到上一级目录~ ：水波带我回家，即/home/我的登录名。例如我的登录名为zhangjie，cd ~命令就是cd /home/zhangjie。当然你直接输入cd，也有同样功效 |                                                              |
+| mkdir                                                        | 建立目录用法：mkdir [OPTION] DIRECTORY…例：mkdir fangru      |
+| ls                                                           | 列出目录下的内容用法：ls [OPTION]…[FILE]…例：ls -al fangru   |
+| cd                                                           | 更换工作目录用法：cd [DIRECTORY]                            例：cd fangru |
+| pwd                                                          | 显示当前工作目录用法：pwd                                    |
+| vim                                                          | 增强版文本编辑器用法：vim [OPTION] [file] 例：vim helloworld.c |
+| cp                                                           | 拷贝文件及其目录用法：cp [OPTION]... SOURCE DEST                                                                                    例：cp jie.txt jie.bak |
+| mv                                                           | 移动（重命名）文件用法：mv [OPTION]…SOURCE DEST                                                         例：mv jieold jienew |
+| rm                                                           | 删除文件或目录用法：rm [OPTION]…FILE…   例：rm -rf jie_dir   |
+| find                                                         | 在目录及其子目录查找文件用法：find [OPTION] [path] [pattern]例：find -name jie*.txt |
+| history                                                      | 显示最近使用过的命令用法：history                            |
+| 文本处理：在讲解之前，有必要说明一下模式的定义。模式是一种表达式，不列出所有元素，而是给出一系列字符串的一种精确描述例如：ab*cd匹配了以ab开始和cd结束的一系列字符串 |                                                              |
+| cat                                                          | 连结文件打印到标准输出用法：cat [OPTION] [FILE]…                                                                                 例：cat pic.png love.txt > pic1.png还记得那个命令行的故事吧？ |
+| echo                                                         | 显示一行文本用法：echo [OPTION] [string]                例：echo $HOME |
+| grep                                                         | 搜索特定的内容并将含有这些内容的行标准输出用法：grep [OPTION] PATTERN [FILE]例：                       grep -i Jagen magicLinux.txt |
+| wc                                                           | 统计指定文件中的字节数、字数、行数,并将统计结果显示输出用法：wc [OPTION]…[FILE]例：                  wc -L magicLinux.txt |
+| sort                                                         | 对文件中的各行进行排序用法：sort [OPTION]…[FILE]例：                                                                          sort -r magicLinux.txt |
+| 系统管理：在讲解这类命令之前，先谈谈文件权限的定义。Linux系统上文件有三种权限-读、写和执行。敲入ls -l命令后，我们会发现有10个字母表示文件类型和权限信息：第一个字母是文件类型，d代表目录，-代表普通文件；接下了的每三个字母为一组，分别代表拥有者（owner）群组成员（groups）其他人（others）的读、写和执行权限。例：drwxrw-r--意味着这是一个目录，拥有者拥有读、写和执行三种权限，群组成员拥有读写权限，其他人只拥有可读权限。权限位还可以用相应的数值来代表，读-4、写-2、执行-1，这些数字或它们的和就代表一个角色的权限。例：rwxrw-r-- = 764673 = rw-rwx-wx |                                                              |
+| chmod                                                        | 控制用户对文件的权限用法：chmod [OPTION] [MODE] [FILE]例：                                                    chmod 764 count.sh |
+| chown                                                        | 改变档案的拥有者用法：chown [OPTION]…OWNER[:[GROUP]] FILE例：chown jie magicLinux.txt |
+| su                                                           | su是切换到其他用户，但是不切换环境变量su - 是完整的切换到一个用户环境要知两者的区别，用export命令一查便知。用法：su [OPTION] [LOGIN]例：su zhangjie |
+| passwd                                                       | 更改使用者的密码参数/etc/passwd存储的是操作系统用户信息，该文件为所有用户可见 /etc/shadow被称为/etc/passwd的影子文件。它们之间的内容是互补的。shadow内容包括用户及被加密的密码以及其它/etc/passwd不能包括的信息，比如用户的有效期限等 用法：passwd [OPTION]例：passwd zhangjie |
+| who                                                          | 显示目前登入系统的用户信息用法：who [OPTION]例：who -b       |
+| 进程管理                                                     |                                                              |
+| ps                                                           | 强悍的进程查看命令用法：ps [OPTION]例：ps -aef               |
+| kill                                                         | 删除执行中的程序或工作用法：kill [OPTION]例：kill -9 3154    |
+| jobs                                                         | 通过jobs命令查到后台正在执行的命令的序号(非进程号pid)用法：jobs |
+| bg                                                           | 指定号码（非进程号）的命令进程放到后台运行用法：输入'ctrl+z' 然后输入 'bg<job id>'例：bg <job id> |
+| fg                                                           | 指定号码（非进程号）的命令进程放到前台运行用法：fg <jobid>   |
+| 档案                                                         |                                                              |
+| tar                                                          | 压缩和解压用法：tar [OPTION] DEST SOURCE例：tar -cvf /home/archive.tar（压缩）tar -xvf /home/archive.tar（解压） |
+| zip                                                          | 打包压缩用法：zip [OPTION] DEST SOURSE例：zip original.zip original |
+| unzip                                                        | 解压缩zip文件用法：unzip filename例：unzip original.zip      |
+| 网络                                                         |                                                              |
+| ssh                                                          | 远程登录的客户端用法：ssh [options] [user]@hostname例：ssh [zhangjie@10.105.11.20](mailto:guest@10.105.11.20) |
+| scp                                                          | 基于ssh登陆进行安全的远程文件拷贝命令用法：scp [options] [[user]@host1:file1] [[user]@host2:file2]例：scp file1.txt zhangjie@10.105.11.20:~/work/ |
+| 文件系统                                                     |                                                              |
+| fdisk                                                        | 观察硬盘之实体使用情形与分割硬盘用用法：fdisk [options]例：sudo fdisk -l |
+| mount                                                        | 如果你要使用储存设备(Mo、硬盘、光驱等)，就得先将它挂上(Mount)，而当储存设备挂上了之后，就可以把它当成一个目录来进行访问。挂上一个设备使用mount命令在使用mount这个指令时，至少要先知道下列三种信息：1. 要Mount对象的文件系统类型？2. 要Mount对象的设备名称?3. 要将设备Mount到哪个目录去？用法：mount -t type device dir例：mount /dev/sda5 /media/target |
+| umount                                                       | 卸除文件系统用法：umount [OPTIONS] dir \| device例：umount /media/target |
+| du                                                           | 查看目录或文件所占用磁盘空间的大小用法：du [OPTION]……[FILE]……例：du |
+| df                                                           | 检查文件系统的磁盘空间占用情况。用法：df [OPTION]……[FILE]……例：df |
+| quota                                                        | 显示磁盘使用情况和限制情况用法：quota [OPTION]例：quota -v   |
+| 扩展                                                         |                                                              |
+| reboot                                                       | 重启系统用法：reboot [OPTION]例：reboot                      |
+| poweroff                                                     | 关闭系统用法：poweroff [OPTION]例：poweroff                  |
+| sed                                                          | 一种在线编辑器，它一次处理一行内容用法：sed [OPTION] [input-file]例：sed 's/love/hate/g' loveletter.txt |
+| awk                                                          | 一种文本处理工具，Linux及Unix环境中功能最强大的数据处理引擎之一。用法：awk [-F fs] [-v var=value] [-f progfile \| 'prog'] [file ……]例：awk '/^[ns]/{print $1}' test |
+
 
 
 ## Linux配置文件加载顺序

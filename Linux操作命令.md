@@ -474,6 +474,10 @@ ln -s /usr/local/mysql/bin/mysql /usr/bin
 ln /usr/local/mysql/bin/mysql /usr/bin
 ```
 
+## chmod
+
+​	授权命令
+
 ## nl
 
 ​	nl命令在[linux](http://codex.wordpress.org.cn/Linux)系统中用来计算文件中行号。nl 可以将输出的文件内容自动的加上行号！其默认的结果与 cat -n 有点不太一样， nl 可以将行号做比较多的显示设计，包括位数与是否自动补齐 0 等等的功能。 
@@ -603,3 +607,4 @@ echo id_rsa.pub >>authorized_keys
 cp id_rsa.pub authorized_keys
 ```
 
+##  
