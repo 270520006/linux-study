@@ -616,6 +616,8 @@ nl [选项]... [文件]...
 
 ### 简单的传输文件
 
+* 把本地放到远程
+
 ```shell
 Administrator@XTZJ-20210428JL MINGW64 ~/Desktop
 $ scp Linux操作命令.md root@121.196.202.119:/home/linux-study
@@ -626,6 +628,12 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
 Warning: Permanently added '121.196.202.119' (ED25519) to the list of known hosts.
 root@121.196.202.119's password:
 Linux操作命令.md                          100% 1262    44.8KB/s   00:00
+```
+
+* 把远程文件放到本地
+
+```shell
+scp root@www.runoob.com:/app/copuser/test.tmp /c/user/zhusp/Desktop
 ```
 
 ## rsa验证
