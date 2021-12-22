@@ -662,4 +662,16 @@ echo id_rsa.pub >>authorized_keys
 cp id_rsa.pub authorized_keys
 ```
 
-##  
+## 加密/解密
+
+### base64
+
+```shell
+加密：
+$ echo Hello World | base64
+SGVsbG8gV29ybGQK
+解密：
+$ echo SGVsbG8gV29ybGQK | base64 -d
+Hello World
+```
+
