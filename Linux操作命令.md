@@ -636,6 +636,10 @@ Linux操作命令.md                          100% 1262    44.8KB/s   00:00
 scp root@www.runoob.com:/app/copuser/test.tmp /c/user/zhusp/Desktop
 ```
 
+* 如果需要递归发送文件夹则加上-r
+```shell
+scp -r root@www.runoob.com:/app/copuser/testfile/c/user/zhusp/Desktop
+```
 ## rsa验证
 
 ### scp免密设置（可本机）
