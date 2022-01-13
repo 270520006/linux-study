@@ -250,3 +250,17 @@ ${-#*i} 这个表达式的意思是：从左向右，在 - 变量中找到第一
 
 ![watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NvZGluZ19kb25n,size_16,clor_FFFFFF,t_70](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2NvZGluZ19kb25n,size_16,clor_FFFFFF,t_70.png)
 
+## 补充知识
+
+### 隔离实现	
+
+​	不论是docker还是k8s，他们实现隔离的方式都是基于linux内核的，实际上，不管什么容器，本质上都是进程。只要是进程就可以在/proc/pid上找到对应的环境，例如docker的隔离就是通过/proc/pid的namespace实现的，例如：
+
+* 不同容器上的namespace
+
+![image-20220113172205420](README/image-20220113172205420.png)
+
+* 运行在同一主机上的namespace
+
+![image-20220113172312692](README/image-20220113172312692.png)
+
