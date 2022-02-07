@@ -446,8 +446,6 @@ sed 's/root/user'
      3	daemon:x:2:2:daemon:/sbin:/sbin/nologin  
 ```
 
-
-
 # Linux基本命令
 
 ## man
@@ -496,7 +494,7 @@ ln /usr/local/mysql/bin/mysql /usr/bin
 ​	用户组的管理涉及用户组的添加、删除和修改。组的增加、删除和修改实际上就是对/etc/group文件的更新。
 ​	用户组的管理涉及用户组的添加、删除和修改。组的增加、删除和修改实际上就是对/etc/group文件的更新。
 
-这里把授权的介绍分为两部分，用户/用户组和授权操作：
+这里把授权的介绍分为两部分，用户/用户组和授权操作。
 
 ### 用户组
 
@@ -616,6 +614,31 @@ chown [-R] userName:group fileName
 ```shell
 [root@localhost home]# chmod -R 755  test/
 ```
+
+​	至于文字法就比较复杂了，但是非常直观。首先引入了四个字母u、g、o、a，分别代表拥有者、所属组、其他和全部。接看引入三个操作符+、-、=。分别代表增加，减去、和设定。如“u=rwx，定。如果给拥有者增加“w”权限，可以使用“u+w”代表。或者联合使用，比如“u=rwx,go=rx”则代表给拥有者设定“rwx”权限,给所属组和其他设定rx权限。举个例子，去掉.bashrc文件的执行权限，可以这样操作:
+
+* 文件拥有者：u
+* 所属组：g
+* 其他：o
+* 全部：a
+
+权限使用举例：需要给什么角色什么权限就用+，去除权限就用-
+
+```shell
+[root@localhost demo]# ll
+总用量 0
+-rwxr-xr-x 1 test test 0 1月  11 15:12 demo.sh
+[root@localhost demo]# chmod a-r demo.sh 
+[root@localhost demo]# ll
+总用量 0
+--wx--x--x 1 test test 0 1月  11 15:12 demo.sh
+[root@localhost demo]# chmod a+rw demo.sh 
+[root@localhost demo]# ll
+总用量 0
+-rwxrwxrwx 1 test test 0 1月  11 15:12 demo.sh
+```
+
+
 
 ## ll/ls
 
@@ -769,7 +792,215 @@ ssh-keygen -t rsa
 ssh-copy-id -i  ~/.ssh/id_rsa.pub  用户名字@192.168.x.xxx
 ```
 
+## locate（whereis、which）
 
+​	这个命令用于查找文件位置，一共有5个命令，一般记住2-3个就可以了。
+
+* 使用whereis来查找相关文件的路径，它很快，因为可以在（/var/lib/mlocate/），它每天都会更新一次，所以你如果要查找刚更新的文件，估计不行。当然你可以手动帮他更新下db（updatedb）
+
+```shell
+[root@localhost home]# whereis test 
+test: /usr/bin/test /usr/share/man/man1/test.1.gz
+```
+
+* 使用locate进行查找
+  * 就会匹配到无论是文件名中还是路径中出现过“ls”的文件，有些时候这样的结果是不能使用的，因为太多了。如果要精确搜索，可以这样
+  * 加上-b后，则只会罗列出带ls的路径
+
+```shell
+locate ls
+locate -b "\ls"
+```
+
+* which一般用来查看是否安装了指定的软件
+
+```shell
+[root@localhost home]# which yum
+/usr/bin/yum
+```
+
+* type用来查看是否为shell内置命令
+
+```shell
+[root@localhost home]# type yum 
+yum 已被哈希 (/usr/bin/yum)
+[root@localhost home]# type -p  yum 
+/usr/bin/yum
+```
+
+## find
+
+​	find字符用于查找文件
+
+* Find命令格式
+
+```shell
+find [-H] [-L] [-P] [-D debugopts] [-O level] [path...] [expression]
+```
+
+* find命令选项
+
+```shhell
+-name：使用文件名查找，支持使用通配符
+
+-iname：使用文件名查找，不区分大小写。
+
+-perm：使用文件权限查找
+
+/+权限：匹配任何一类(u,g,o)的权限，符合"权限"内容就输出。
+
+-+权限：u、g、o中只要有一个为"权限"内容，u、g、o都要匹配为"权限"的内容
+
+-user和nouser：查找文件属于u的文件和查找没有属主的文件
+
+-group和-nogroup: 查找文件属于g的文件和查找没有属组的文件
+
+-uid和-gid：查找文件的uid为指定uid的文件和查找文件的gid为指定gid的文件
+
+-type：根据文件类型来查找文件
+
+f：普通文件
+
+d：目录
+
+l：符号连接文件
+
+b：块设备文件
+
+c：字符设备文件
+
+p：命名管道文件
+
+s：套接字文件
+
+-regex：匹配整个文件路径字符串
+
+-size：以文件大小来查找
+
+-atime、-mtime和-ctime：根据时间来查找文件(以天为单位)
+
+-amin、-mmin和-cmin：根据时间来查找文件(以分钟为单位)
+
+-print：默认处理动作
+
+-ls：对查找到的每个文件做"ls -l"动作
+
+-delete：删除查找到的文件
+
+-fls：后面指定一个路径，表示把查找到的内容保存到所指定的路径中
+
+-ok：后面跟指令，表示执行指令对所查到的文件之前需要用户确认
+
+-exec：后面跟指令，表示执行指令对所查到的文件之前无需用户确认
+
+-a：组合查找条件的"与"
+
+-o：组合查找条件的"或"
+
+-not或者！: 组合查找条件的"非"(组合查找条件中优先级为"非"先于"与"先于"或",提升优先级可用())
+```
+
+**举例**
+
+* 查找/home目录下不属于root、bin的所有文件；
+
+```shell
+find /home/ -not -user root -not -user bin
+```
+
+* 查找/home/目录属于root，且属组为test的所有文件
+
+```shell
+drwxr-xr-x 2 test test 21 1月  11 15:12 demo
+-rwxr-xr-x 1 root root  0 1月  12 10:43 demo.test
+-rwxr-xr-x 1 root test 47 1月  12 11:07 test.sh
+[root@localhost test]# find /home/ -user root -group test
+/home/test/test.sh
+```
+
+* 查找/home/目录下，最近一周修改过内容，且不属于root的文件
+
+```shell
+[root@localhost test]# find /home/ -mtime -7 -a -not -user root
+/home/test
+/home/test/.vim
+/home/test/.vim/.netrwhist
+/home/test/demo
+```
+
+* 查找根目录下没有属主也没有属组的文件，且只要2行
+
+```shell
+[root@localhost home]# find / -nouser -nogroup |sed -n '1,2p'
+/proc/2070
+/proc/2070/task
+```
+
+* 查找大小大于20k且修改时间在1天内，并且为普通文件的一个文件
+
+```shell
+[root@localhost home]# find / -size +20k -a -mtime -1 -a -type f -ls |sed -n '1p'
+find: ‘/proc/23062/task/23062/fdinfo/5’: 没有那个文件或目录
+4026532033    0 -r--------   1 root     root     140737486266368 1月 12 12:55 /proc/kcore
+```
+
+* 查找ugo（u是属主，g是属组，o是其他）都有写入权限，并且文件类型为普通文件、
+
+```
+[root@localhost test]# find /home/test/  -perm -222  -type f -ls
+17792972    0 -rwxrwxrwx   1 test     test            0 1月 11 15:12 /home/test/demo/demo.sh
+```
+
+* 查找都有执行权限，并且其他用户拥有写入权利的文件
+
+```shell
+[root@localhost test]# find /home/test/  -perm -111 -a -perm -002 -ls  
+17792972    0 -rwxrwxrwx   1 test     test            0 1月 11 15:12 /home/test/demo/demo.sh
+```
+
+## 乱码问题
+
+* 可以使用命令查看当前系统支持的字符集
+
+```shell
+locale -a |grep zh
+```
+
+* 如果没有安装中文字符集则安装
+
+```shell
+yum -y groupinstall chinese-support
+```
+
+* 这里要介绍下字符集加载顺序
+  * 就是 /etc/profile 生效的，会被 ~/.bash_profile生效的所覆盖（以下同理）
+
+```shell
+1: /etc/profile           #对所有用户的登录shell都有效（全局配置文件），最好不要修改这个文件
+2: ~/.bash_profile        #为当前用户设置环境信息，仅对当前用户的登录shell有效（局部配置文件）
+3: ~/.bash_login 
+4: ~/.profile
+5: ~/.bashrc             #bash_profile只被登录shell读取并执行一次，
+                         #如果在命令行上键入bash启动一个新的shell，这个新shell读取的是.bashrc而不是.bash_profile，
+                         #将登录shell和运行一个子shell所需的配置文件分开可以获取非常灵活的配置策略，从而满足不同的场景。
+6: /etc/bashrc
+7: /etc/profile.d/*.sh
+8: .bash_history	     #操作bash的历史记录
+9: /etc/bashrc	         #和.bashrc的含义一样，只不过适用于所有的用户
+```
+
+* 还得再介绍一下**优先级的关系：LC_ALL > LC_*\>LANG**
+
+  * 情况1：设定了LANG为zh_CN.GBK，再将LC_ALL设为C，则除了LANG以外的所有都会以LC_ALL 为准
+  * 情况2：设定了LC_*为zh_CN.GBK，再设置LANG为C，会发现并不生效
+
+  情况1，如图1所示：
+
+  ![image-20220207110540313](Linux操作命令/image-20220207110540313.png)
+
+  情况2，如图2所示：
+
+![image-20220207111753543](Linux操作命令/image-20220207111753543.png)
 
 ## 加密/解密
 
