@@ -448,6 +448,58 @@ sed 's/root/user'
 
 # Linux基本命令
 
+## history
+
+​	该命令用于查询历史使用过的命令,相关的重要参数有$HISTSIZE和$HISTFILESIZE 
+
+> history这条命令能够查询出多少条取决于$HISTSIZEZ
+>
+> $HISTSIZE 定义了 history 命令输出的记录数，即输出~/.bash_history文件中的最后HISTSIZE行
+
+* 选项与参数 
+  * n ：数字，意思是“要列出最近的 n 笔命令列表”的意思！ 
+  * -c ：将目前的 shell 中的所有 history 内容全部消除 
+  * -a ：将目前新增的 history 指令新增入 histfiles 中，若没有加 histfiles ， 则默认写入 ~/.bash_history 
+  * -r ：将 histfiles 的内容读到目前这个 shell 的 history 记忆中； 
+  * -w ：将目前的 history 记忆内容写入 histfiles 中！ 
+
+举个例子：
+
+```shell
+#显示三条
+[dmtsai@study ~]$ history 3 
+```
+
+* 注意事项
+
+> * 当我们以 bash 登陆 Linux 主机之后，系统会主动的由主文件夹的 ~/.bash_history 读取以前曾经下过的指令，那么 ~/.bash_history 会记录几笔数据呢？这就与你 bash 的 HISTFILESIZE 这个变量设置值有关了！
+>
+> * 假设我这次登陆主机后，共下达过 100 次指令，“等我登出时， 系统就会将 101~1100 这总共 1000 笔历史命令更新到 ~/.bash_history 当中。” 也就是说，历史命令在我登出时，会将最近的 HISTFILESIZE 笔记录到我的纪录档当中啦！
+>
+> * 当然，也可以用 history -w 强制立刻写入的！那为何用“更新”两个字呢？ 因为 ~/.bash_history 记录的笔数永远都是 
+>
+>   HISTFILESIZE 那么多，旧的讯息会被主动的拿掉！仅保留最新的！
+
+* 也可以执行命令
+
+```
+[dmtsai@study ~]$ history 
+66 man rm 
+67 alias 
+68 man history 69 history 
+[dmtsai@study ~]$ !66 <==执行第 66 笔指令 
+[dmtsai@study ~]$ !! <==执行上一个指令，本例中亦即 !66 
+[dmtsai@study ~]$ !al <==执行最近以 al 为开头的指令（上头列出的第 67 个）
+```
+
+* 存在问题
+  * 如果同时存在多个窗口输入命令，history只能保存最后一个用户的命令，其他用户的命令会被覆盖
+
+* 解决方法
+  * 由于多重登陆有这样的问题，所以很多朋友都习惯单一 bash 登陆，再用工作控制 （job control, 第四篇会介绍） 来切换不同工作！ 这样才能够将所有曾经下达过的指令记录下来，也才方便未来系统管理员进行指令的 debug 啊！
+
+
+
 ## man
 
 ​	对一个命令能附加的参数不了解的话，可以使用man命令进行查询。例如：
@@ -495,6 +547,8 @@ ln /usr/local/mysql/bin/mysql /usr/bin
 ​	用户组的管理涉及用户组的添加、删除和修改。组的增加、删除和修改实际上就是对/etc/group文件的更新。
 
 这里把授权的介绍分为两部分，用户/用户组和授权操作。
+
+>r：4，w：2，x：1
 
 ### 用户组
 
@@ -733,6 +787,12 @@ nl [选项]... [文件]...
 解包：ar p FileName.deb data.tar.gz | tar zxf -
 ```
 
+* 解压jar包
+
+```
+jar -xvf project.jar
+```
+
 
 
 ## scp
@@ -826,6 +886,39 @@ locate -b "\ls"
 yum 已被哈希 (/usr/bin/yum)
 [root@localhost home]# type -p  yum 
 /usr/bin/yum
+```
+
+## nohup
+
+* 最终命令如下
+
+```bash
+nohup java -jar xxx.jar >logs.txt &
+```
+
+* 正常起jar包
+
+```bash
+java -jar xxx.jar
+```
+
+这个命令会锁定命令窗口，只能看到当前运行的输出信息。而无法发送其他指令。
+
+* 让jar包后台运行：
+
+  用"&"符号结尾表示，让程序在后台运行。
+  这样的话，命令窗口就不会被锁定，而可以发送其他指令，但是当窗口关闭时，后台运行的程序依然会被停止。
+
+```bash
+java -jar xxx.jar >logs.txt &
+```
+
+* nohup命令：
+
+  nohup 命令运行由 Command参数和任何相关的 Arg参数指定的命令，忽略所有挂断信号。要运行后台中的 nohup 命令，添加 & （ 表示“and”的符号）到命令的尾部。
+
+```bash
+java -jar xxx.jar >logs.txt 
 ```
 
 ## find
@@ -956,6 +1049,21 @@ find: ‘/proc/23062/task/23062/fdinfo/5’: 没有那个文件或目录
 ```shell
 [root@localhost test]# find /home/test/  -perm -111 -a -perm -002 -ls  
 17792972    0 -rwxrwxrwx   1 test     test            0 1月 11 15:12 /home/test/demo/demo.sh
+```
+
+## 磁盘分区
+
+* 查看磁盘容量：df
+
+```bash
+#查看磁盘占用情况
+[root@localhost dev]# df -h
+```
+
+* 查看磁盘占用数据：du -m
+
+```bash
+du -m
 ```
 
 ## 乱码问题
