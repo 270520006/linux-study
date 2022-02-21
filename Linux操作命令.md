@@ -1051,7 +1051,7 @@ find: ‘/proc/23062/task/23062/fdinfo/5’: 没有那个文件或目录
 17792972    0 -rwxrwxrwx   1 test     test            0 1月 11 15:12 /home/test/demo/demo.sh
 ```
 
-## 磁盘分区
+## 磁盘操作
 
 * 查看磁盘容量：df
 
@@ -1065,6 +1065,256 @@ find: ‘/proc/23062/task/23062/fdinfo/5’: 没有那个文件或目录
 ```bash
 du -m
 ```
+
+* 查看虚拟机内部硬盘情况
+
+```bash
+[root@localhost ~]# fdisk -l
+
+磁盘 /dev/sda：322.1 GB, 322122547200 字节，629145600 个扇区
+Units = 扇区 of 1 * 512 = 512 bytes
+扇区大小(逻辑/物理)：512 字节 / 512 字节
+I/O 大小(最小/最佳)：512 字节 / 512 字节
+磁盘标签类型：dos         #记住这个，dos和mbr一样：用fdisk ，如果是gpt则用gdisk
+磁盘标识符：0x000cebe4
+
+   设备 Boot      Start         End      Blocks   Id  System
+/dev/sda1   *        2048     2099199     1048576   83  Linux
+/dev/sda2         2099200    42758143    20329472   8e  Linux LVM
+/dev/sda3        42758144    63729663    10485760   8e  Linux LVM
+
+磁盘 /dev/mapper/centos-root：29.4 GB, 29360128000 字节，57344000 个扇区
+Units = 扇区 of 1 * 512 = 512 bytes
+扇区大小(逻辑/物理)：512 字节 / 512 字节
+I/O 大小(最小/最佳)：512 字节 / 512 字节
+
+
+磁盘 /dev/mapper/centos-swap：2189 MB, 2189426688 字节，4276224 个扇区
+Units = 扇区 of 1 * 512 = 512 bytes
+扇区大小(逻辑/物理)：512 字节 / 512 字节
+I/O 大小(最小/最佳)：512 字节 / 512 字节
+
+```
+
+### VirtualBox磁盘扩容
+
+​	在我给docker安装apollo三件套的时候，我的centos7系统报，剩余空间不足，顿时就感觉开始头疼，因为我虽然经常用linux系统，但是从来没有给空间扩容过，一顿百度，并没有无UI版本的扩容方式。花了两天时间，总算让我把扩容做好了。先说下目标，目标就是给我需要的盘符，增加10G磁盘空间。
+
+* 使用VirtualBox虚拟机进行磁盘扩容，首先需要拉起虚拟磁盘扩容，修改完后重启下。
+
+  * 管理--->虚拟介质管理器--->属性
+  * 调到你需要的大小，注意！这个只能调大，不能调小，所以别瞎调。
+
+  （瞎调也没事，因为是虚拟的，大不了分配的时候给少点就可以）
+
+![image-20220221102518062](Linux操作命令/image-20220221102518062.png)
+
+* 先使用**df-h**查看当前磁盘情况，会发现已经满了，基本上无法处理了。
+
+![image-20220221104016136](Linux操作命令/image-20220221104016136.png)
+
+* 输入**fdisk -l**查看虚拟内存是否已经记录
+
+![image-20220221104820330](Linux操作命令/image-20220221104820330.png)
+
+* 使用**fdisk /dev/sda**进入上面的虚拟磁盘中（/dev/sda为虚拟磁盘名，具体是什么，看你虚拟机怎么给你创的）
+
+```bash
+[root@localhost ~]# fdisk /dev/sda
+欢迎使用 fdisk (util-linux 2.23.2)。
+更改将停留在内存中，直到您决定将更改写入磁盘。
+使用写入命令前请三思。
+命令(输入 m 获取帮助)：m   ---输出帮助信息
+命令操作
+   a   toggle a bootable flag ---设置启动分区
+   b   edit bsd disklabel	---编辑分区标签
+   c   toggle the dos compatibility flag	#设置dos兼容标记
+   d   delete a partition	 --删除一个分区
+   g   create a new empty GPT partition table	--列出分区类型
+   G   create an IRIX (SGI) partition table	--列出分区类型
+   l   list known partition types	#列出已知分区类型
+   m   print this menu	--帮助
+   n   add a new partition	--建立一个新的分区	
+   o   create a new empty DOS partition table	--创建一个新的空白DOS分区表
+   p   print the partition table	---打印分区表
+   q   quit without saving changes	---退出不保存设置
+   s   create a new empty Sun disklabel	#创建一个空的SUN磁盘标签
+   t   change a partition's system id	 ---改变分区的ID
+   u   change display/entry units	---改变显示的单位
+   v   verify the partition table	 ---检查验证分区表
+   w   write table to disk and exit	  ---保存分区表
+   x   extra functionality (experts only)	#额外的功能（专家模式）
+```
+
+* 新建新的分区
+
+```bash
+命令(输入 m 获取帮助)：n
+Partition type:
+   p   primary (2 primary, 0 extended, 2 free)
+   e   extended
+```
+
+* 选择分区号
+
+```shell
+Select (default p): p
+分区号 (3,4，默认 3)：    #直接默认即可
+起始 扇区 (42758144-629145599，默认为 42758144)：#直接默认即可
+将使用默认值 42758144
+#这里是选择你要扩容的大小，不用和虚拟内存大小一样大
+Last 扇区, +扇区 or +size{K,M,G} (42758144-629145599，默认为 629145599)：+10G 	  #我这里只需要10g
+分区 3 已设置为 Linux 类型，大小设为 10 GiB
+```
+
+* 切换分区id到刚分好的分区内，设置分区编码为8e，然后保存编辑
+
+```bash
+Hex 代码(输入 L 列出所有代码)：L
+ 0  空              24  NEC DOS         81  Minix / 旧 Linu bf  Solaris        
+ 1  FAT12           27  隐藏的 NTFS Win 82  Linux 交换 / So c1  DRDOS/sec (FAT-
+ 2  XENIX root      39  Plan 9          83  Linux           c4  DRDOS/sec (FAT-
+ 3  XENIX usr       3c  PartitionMagic  84  OS/2 隐藏的 C:  c6  DRDOS/sec (FAT-
+ 4  FAT16 <32M      40  Venix 80286     85  Linux 扩展      c7  Syrinx         
+ 5  扩展            41  PPC PReP Boot   86  NTFS 卷集       da  非文件系统数据 
+ 6  FAT16           42  SFS             87  NTFS 卷集       db  CP/M / CTOS / .
+ 7  HPFS/NTFS/exFAT 4d  QNX4.x          88  Linux 纯文本    de  Dell 工具      
+ 8  AIX             4e  QNX4.x 第2部分  8e  Linux LVM       df  BootIt         
+ 9  AIX 可启动      4f  QNX4.x 第3部分  93  Amoeba          e1  DOS 访问       
+ a  OS/2 启动管理器 50  OnTrack DM      94  Amoeba BBT      e3  DOS R/O        
+ b  W95 FAT32       51  OnTrack DM6 Aux 9f  BSD/OS          e4  SpeedStor      
+ c  W95 FAT32 (LBA) 52  CP/M            a0  IBM Thinkpad 休 eb  BeOS fs        
+ e  W95 FAT16 (LBA) 53  OnTrack DM6 Aux a5  FreeBSD         ee  GPT            
+ f  W95 扩展 (LBA)  54  OnTrackDM6      a6  OpenBSD         ef  EFI (FAT-12/16/
+10  OPUS            55  EZ-Drive        a7  NeXTSTEP        f0  Linux/PA-RISC  
+11  隐藏的 FAT12    56  Golden Bow      a8  Darwin UFS      f1  SpeedStor      
+12  Compaq 诊断     5c  Priam Edisk     a9  NetBSD          f4  SpeedStor      
+14  隐藏的 FAT16 <3 61  SpeedStor       ab  Darwin 启动     f2  DOS 次要       
+16  隐藏的 FAT16    63  GNU HURD or Sys af  HFS / HFS+      fb  VMware VMFS    
+17  隐藏的 HPFS/NTF 64  Novell Netware  b7  BSDI fs         fc  VMware VMKCORE 
+18  AST 智能睡眠    65  Novell Netware  b8  BSDI swap       fd  Linux raid 自动
+1b  隐藏的 W95 FAT3 70  DiskSecure 多启 bb  Boot Wizard 隐  fe  LANstep        
+1c  隐藏的 W95 FAT3 75  PC/IX           be  Solaris 启动    ff  BBT            
+1e  隐藏的 W95 FAT1 80  旧 Minix       
+Hex 代码(输入 L 列出所有代码)：8e
+已将分区“Linux”的类型更改为“Linux LVM”
+命令(输入 m 获取帮助)：w
+The partition table has been altered!
+```
+
+* 重启虚拟机，输入**fdisk -l**查看分区新建是否成功
+
+```
+[root@localhost ~]# fdisk -l
+
+磁盘 /dev/sda：322.1 GB, 322122547200 字节，629145600 个扇区
+Units = 扇区 of 1 * 512 = 512 bytes
+扇区大小(逻辑/物理)：512 字节 / 512 字节
+I/O 大小(最小/最佳)：512 字节 / 512 字节
+磁盘标签类型：dos
+磁盘标识符：0x000cebe4
+
+   设备 Boot      Start         End      Blocks   Id  System
+/dev/sda1   *        2048     2099199     1048576   83  Linux
+/dev/sda2         2099200    42758143    20329472   8e  Linux LVM
+/dev/sda3        42758144    63729663    10485760   8e  Linux LVM
+```
+
+可以看到新的分区`/dev/sda3`已经标记为Linux LVM，如果没有需要`reboot`或者`partprobe`。
+
+### 调整LVM大小
+
+​	把虚拟存储空间转换成对应盘符以后，还需要把盘符挂载到LVM上，才可以使用该盘符。
+
+```shell
+[root@localhost ~]# vgdisplay   #查看当前LVM信息
+  --- Volume group ---
+  VG Name               centos
+  System ID             
+  Format                lvm2
+  Metadata Areas        1
+  Metadata Sequence No  3
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                2
+  Open LV               1
+  Max PV                0
+  Cur PV                1
+  Act PV                1
+  VG Size               <19.39 GiB
+  PE Size               4.00 MiB
+  Total PE              4963
+  Alloc PE / Size       4963 / <19.39 GiB
+  Free  PE / Size       0 / 0   
+  VG UUID               xWgkaH-MxRB-8NP1-qtIH-Cfld-uoKV-X1o4ky
+```
+
+`centos`是我的`VolumeGroup`的名称，实际操作时，需要使用实际显示的名称。
+
+* 创造物理卷并扩容LVM
+
+```shell
+[root@localhost ~]# pvcreate /dev/sda3
+  Physical volume "/dev/sda3" successfully created.
+[root@localhost ~]# vgextend centos /dev/sda3
+  Volume group "centos" successfully extended
+[root@localhost ~]# lvextend /dev/mapper/centos-root /dev/sda3
+  Size of logical volume centos/root changed from <17.35 GiB (4441 extents) to 27.34 GiB (7000 extents).
+  Logical volume centos/root successfully resized.
+[root@localhost ~]# resize2fs /dev/mapper/centos-root
+resize2fs 1.42.9 (28-Dec-2013)
+resize2fs: Bad magic number in super-block 当尝试打开 /dev/mapper/centos-root 时
+找不到有效的文件系统超级块.
+```
+
+* 发现调整文件逻辑卷大小失败，查看文件格式，发现/dev/mapper/centos-root是xfs格式的
+
+```shell
+[root@localhost ~]# df -hT
+文件系统                类型      容量  已用  可用 已用% 挂载点
+devtmpfs                devtmpfs  1.9G     0  1.9G    0% /dev
+tmpfs                   tmpfs     1.9G     0  1.9G    0% /dev/shm
+tmpfs                   tmpfs     1.9G  9.4M  1.9G    1% /run
+tmpfs                   tmpfs     1.9G     0  1.9G    0% /sys/fs/cgroup
+/dev/mapper/centos-root xfs        18G   18G  116M  100% /
+/dev/sda1               xfs      1014M  150M  864M   15% /boot
+overlay                 overlay    18G   18G  116M  100% /var/lib/docker/overlay2/32c94f9eaaa644a0b6bfb3b89265965f3cf80088ed9db49cdbda37633a6e49c3/merged
+overlay                 overlay    18G   18G  116M  100% /var/lib/docker/overlay2/23bb01524652cadd57d8ad7b72e0a6b1b63660cc450034e643b4cfaa7042b376/merged
+```
+
+* xfs格式的文件扩充需要使用 xfs_growfs
+
+```shell
+[root@localhost ~]# xfs_growfs /dev/mapper/centos-root
+meta-data=/dev/mapper/centos-root isize=512    agcount=4, agsize=1136896 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=0 spinodes=0
+data     =                       bsize=4096   blocks=4547584, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0 ftype=1
+log      =internal               bsize=4096   blocks=2560, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+data blocks changed from 4547584 to 7168000
+```
+
+* 再次查看磁盘情况
+
+```shell
+root@localhost ~]# df -hT
+文件系统                类型      容量  已用  可用 已用% 挂载点
+devtmpfs                devtmpfs  1.9G     0  1.9G    0% /dev
+tmpfs                   tmpfs     1.9G     0  1.9G    0% /dev/shm
+tmpfs                   tmpfs     1.9G  9.4M  1.9G    1% /run
+tmpfs                   tmpfs     1.9G     0  1.9G    0% /sys/fs/cgroup
+/dev/mapper/centos-root xfs        28G   18G   11G   64% /
+/dev/sda1               xfs      1014M  150M  864M   15% /boot
+overlay                 overlay    28G   18G   11G   64% /var/lib/docker/overlay2/32c94f9eaaa644a0b6bfb3b89265965f3cf80088ed9db49cdbda37633a6e49c3/merged
+overlay                 overlay    28G   18G   11G   64% /var/lib/docker/overlay2/23bb01524652cadd57d8ad7b72e0a6b1b63660cc450034e643b4
+```
+
+至此，centos7的扩容
 
 ## 乱码问题
 
